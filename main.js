@@ -6,7 +6,7 @@
 window.onload = start;
 
 let allIncidents = null;
-
+let fields = null;
 
 function start() {
 	// Specify the width and height of the overview
@@ -38,7 +38,7 @@ function start() {
 		.attr('style', "border: 1px solid #777;");
 
 	detail.append('text')
-		.attr('x', dWidth / 2 - 40)
+		.attr('x', dWidth / 2 - 55)
 		.attr('y', 20)
 		.attr("class", "smallHeading")
 		.text('Detail Section');
@@ -71,16 +71,46 @@ function start() {
 	}, function (error, data) {
 
 		allIncidents = data;
+		fields = Object.keys(allIncidents[0]);
 
-		detail
-			.append("g")
-			.attr("transform", "translate(0," + (dWidth - 30) + ")")
-			.append("text")
-			.attr("class", "textBody")
-			.attr("x", dWidth - 16)
-			.attr("y", -6)
-			// .style("text-anchor", "end")
-			.text("SATM");
 
+
+
+
+		console.log(allIncidents);
+		let column1 = detail.append("g").attr("transform", "translate(20, 300)");
+		let column2 = detail.append("g").attr("transform", "translate(" + (20 + dWidth / 2) + ", 300)");
+		fields.forEach((key, idx) => {
+			let fieldsInCol1 = 10;
+			if(idx < fieldsInCol1) {
+				column1
+					.append("text")
+					.attr("id", key)
+					.attr("class", "textBody")
+					.attr("y", 21 * idx)
+					.text("");
+			} else {
+				column2
+					.append("text")
+					.attr("id", key)
+					.attr("class", "textBody")
+					.attr("y", 21 * (idx - fieldsInCol1))
+					.text("");
+			}
+		});
+		visualizeDataCase(allIncidents[0]);
+
+	});
+}
+
+
+//dataCase should just be the basic automatically d3 read in object
+function visualizeDataCase(dataCase) {
+	fields.forEach((field) => {
+		let fieldValue = dataCase[field];
+		if(fieldValue == null) {
+			fieldValue = "Unknown"
+		}
+		document.getElementById(field).innerHTML = field.replace(new RegExp("_", 'g'), " ") + ": " + fieldValue;
 	});
 }
