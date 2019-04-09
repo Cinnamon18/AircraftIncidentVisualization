@@ -7,61 +7,42 @@ window.onload = start;
 
 let allIncidents = null;
 let fields = null;
+let xAxisLabel, yAxisLabel, zAxisLabel;
 
 function start() {
 	// Specify the width and height of the overview
-	var oWidth = 800;
-	var oHeight = 500;
-	var dWidth = 600;
-	var dHeight = 500;
-	var fWidth = 1410;
-	var fHeight = 100;
+	let oWidth = 800;
+	let oHeight = 500;
+    let dWidth = 600;
+    let dHeight = 500;
 
-	// create svg for the 3 sections
-	var overview = d3.select("#overview")
-		.append("svg:svg")
-		.attr("width", oWidth)
-		.attr("height", oHeight)
-		.attr('style', "border: 1px solid #777;");
+    // create svg for the 3 sections
+    let overview = d3.select("#overview")
+        .append("svg:svg")
+        .attr("width",oWidth)
+        .attr("height",oHeight)
+        .attr('style', "border: 1px solid #777;");
 
-	overview.append('text')
-		.attr('x', oWidth / 2 - 50)
-		.attr('y', 20)
-		.attr("class", "smallHeading")
-		.text('Overview Section');
+    overview.append('text')
+            .attr('x', oWidth / 2 - 50)
+            .attr('y', 20)
+            .text('Overview Section');
 
 
-	var detail = d3.select("#detail")
-		.append("svg:svg")
-		.attr("width", dWidth)
-		.attr("height", dHeight)
-		.attr('style', "border: 1px solid #777;");
+    let detail = d3.select("#detail")
+        .append("svg:svg")
+        .attr("width",dWidth )
+        .attr("height",dHeight)
+        .attr('style', "border: 1px solid #777;");
 
-	detail.append('text')
-		.attr('x', dWidth / 2 - 55)
-		.attr('y', 20)
-		.attr("class", "smallHeading")
-		.text('Detail Section');
+    detail.append('text')
+        .attr('x', dWidth / 2 - 40)
+        .attr('y', 20)
+        .text('Detail Section');
 
-	var filter = d3.select("#filter")
-		.append("svg:svg")
-		.attr("width", fWidth)
-		.attr("height", fHeight)
-		.attr('style', "border: 1px solid #777;");
+    let filter = d3.select("#filter");
 
-	filter.append('text')
-		.attr('x', 20)
-		.attr('y', 20)
-		.attr("class", "smallHeading")
-		.text('Filter Section');
-
-
-	var xScale = d3.scaleLinear().range([0, oWidth]);
-	var yScale = d3.scaleBand().rangeRound([0, oHeight], 0.3);
-
-	// Tell D3 to create a y-axis scale for us, and orient it to the left.
-	// That means the labels are on the left, and tick marks on the right.
-	var yAxis = d3.axisLeft(yScale);
+    createFilters(filter);
 
 
 	// D3 will grab all the data from "aircraft_incidents.csv" and make it available
@@ -179,4 +160,71 @@ function visualizeDataCase(dataCase) {
 			.attr("height", "90")
 			.attr("xlink:href", "cloud.svg");
 	}
+}
+
+//
+function createFilters(filter) {
+	let xOptions = ["date", "injuries", "deaths"];
+	let yOptions = ["date", "injuries", "deaths"];
+	let zOptions = ["make", "airline", "phaseOfFlight", "injurySeverity", "aircraftDamage"];
+
+    filter.append('text')
+        .attr('x', 20)
+        .attr('y', 20)
+        .text('Choose x-axis: ');
+
+	let xAxisSelector = filter.append('select')
+        .attr('class','select')
+		.attr('id', '#xAxisSelector');
+
+    xAxisSelector.selectAll('option')
+		.data(xOptions)
+		.enter()
+		.append('option')
+		.text(function (d) { return d; });
+
+    filter.append('text')
+        .text('Choose y-axis: ');
+
+    let yAxisSelector = filter.append('select')
+        .attr('class','select')
+        .attr('id', '#yAxisSelector');
+
+    yAxisSelector.selectAll('option')
+        .data(yOptions)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; });
+
+    filter.append('text')
+        .text('Choose z-axis: ');
+
+    let zAxisSelector = filter.append('select')
+        .attr('class','select')
+        .attr('id', '#zAxisSelector');
+
+    zAxisSelector.selectAll('option')
+        .data(zOptions)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; });
+
+    filter.append('p')
+        .append('button')
+        .text('Set Axes')
+        .on('click', function() {
+			getAxesValues();
+        });
+}
+
+
+// set axes values to use in overview graph
+function getAxesValues() {
+    let x = document.getElementById('#xAxisSelector');
+    xAxisLabel= x.options[x.selectedIndex].value;
+    let y = document.getElementById('#yAxisSelector');
+    yAxisLabel= y.options[y.selectedIndex].value;
+    let z = document.getElementById('#zAxisSelector');
+    zAxisLabel= z.options[z.selectedIndex].value;
+    console.log(xAxisLabel + " " + yAxisLabel + " " + zAxisLabel);
 }
