@@ -16,3 +16,16 @@
 .x.axis path {
   display: none;
 }
+
+#overview {
+  float:left;
+  margin: 5px;
+}
+#detail{
+  float:left;
+  margin: 5px;
+}
+#filter {
+  float:left;
+  margin: 5px;
+}

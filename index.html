@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>D3 is awesome</title>
+	<title>Aircraft Incident</title>
 	<!-- Always include D3 first. -->
 	<script src="http://d3js.org/d3.v4.min.js"></script>
 	<!-- Include main.js, which is where all our code lives -->
@@ -13,19 +13,12 @@
 </head>
 
 <body>
-	<h1>Letter Frequency</h1>
-	<!-- Our graph will be added inside this divider element -->
-	<div id="graph"></div>
-	<p>Filter Color</p>
-	<select id="mySelect" onchange="updateSelect()" size="4">
-		<option selected>Red</option>
-		<option>Green</option>
-		<option>Yellow</option>
-		<option>Purple</option>
-	</select>
-
-	<p>Cutoff:</p>
-	<input type="number" id="cutoff" onchange="updatefilter()" >
+	<h1>Aircraft Incidents</h1>
+	<div id="wrapper" >
+        <div id="overview"></div>
+        <div id="detail"></div>
+        <div id="filter"></div>
+	</div>
 </body>
 
 </html>

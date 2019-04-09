@@ -5,68 +5,52 @@
 // even though it is defined on line 8.
 window.onload = start;
 
-// This is where all of our javascript code resides. This method
-// is called by "window" when the document (everything you see on
-// the screen) has finished loading.
-
-let filterColor = "red";
-
-function updateSelect() {
-	let select = document.getElementById("mySelect");
-	filterColor = ["red", "green", "yellow", "purple"][select.selectedIndex];
-}
-
-let filterCutoff = 0;
-
-function updatefilter() {
-	filterCutoff = document.getElementById("cutoff").value;
-	console.log(filterCutoff);
-}
 
 
 function start() {
+	// Specify the width and height of the overview
+	var oWidth = 800;
+	var oHeight = 500;
+    var dWidth = 600;
+    var dHeight = 500;
+    var fWidth = 1410;
+    var fHeight = 100;
+
+    // create svg for the 3 sections
+    var overview = d3.select("#overview")
+        .append("svg:svg")
+        .attr("width",oWidth)
+        .attr("height",oHeight)
+        .attr('style', "border: 1px solid #777;");
+
+    overview.append('text')
+            .attr('x', oWidth / 2 - 50)
+            .attr('y', 20)
+            .text('Overview Section');
 
 
+    var detail = d3.select("#detail")
+        .append("svg:svg")
+        .attr("width",dWidth )
+        .attr("height",dHeight)
+        .attr('style', "border: 1px solid #777;");
 
+    detail.append('text')
+        .attr('x', dWidth / 2 - 40)
+        .attr('y', 20)
+        .text('Detail Section');
 
+    var filter = d3.select("#filter")
+        .append("svg:svg")
+        .attr("width",fWidth)
+        .attr("height",fHeight)
+        .attr('style', "border: 1px solid #777;");
 
+    filter.append('text')
+        .attr('x', 20)
+        .attr('y', 20)
+        .text('Filter Section');
 
-	// Select the graph from the HTML page and save
-	// a reference to it for later.
-	var graph = document.getElementById('graph');
-
-	// Specify the width and height of our graph
-	// as variables so we can use them later.
-	// Remember, hardcoding sucks! :)
-	var width = 700;
-	var height = 600;
-
-	// Here we tell D3 to select the graph that we defined above.
-	// Then, we add an <svg></svg> tag inside the graph.
-	// On the <svg> element, we set the width and height.
-	// Then, we save the reference to this element in the "svg" variable,
-	// so we can use it later.
-	// 
-	// So our code now looks like this in the browser:
-	// <svg width="700" height="600">
-	// </svg>
-	var svg = d3.select(graph)
-		.append('svg')
-		.attr('width', width)
-		.attr('height', height);
-
-	// Remember, "svg" now references to <svg width="700" height="600"></svg>
-	// So now we append a group <g></g> tag to our svg element, and return a
-	// reference to that and save it in the "bars" variable.
-	// 
-	// Now bars looks like this:
-	// <g></g>
-	// 
-	// And the svg element in our browser looks like this:
-	// <svg width="700" height="600">
-	//  <g></g>
-	// </svg>
-	var bars = svg.append('g');
 
 	// Our bar chart is going to encode the letter frequency as bar width.
 	// This means that the length of the x axis depends on the length of the bars.
@@ -78,115 +62,28 @@ function start() {
 	// That means the labels are on the left, and tick marks on the right.
 	var yAxis = d3.axisLeft(yScale);
 
-	// Add a button below the graph. Clicking on this button will
-	// run a filter on the data and use an animation in the process.
-	// 
-	// Our HTML will now look like this:
-	// <div id="graph">
-	//  <svg width="700" height="600">...</svg>
-	//  <p>
-	//    <button>Filter Data</button>
-	//  </p>
-	// </div>
-	d3.select(graph)
-		.append('p')
-		.append('button')
-		.style("border", "1px solid black")
-		.text('Filter Data')
-		.on('click', function () {
-			bars.selectAll('.bar')
-				.filter(function (d) {
-					return d.frequency > filterCutoff;
-				})
-				.transition()
-				.duration(function (d) {
-					return Math.random() * 2000;
-				})
-				.delay(function (d) {
-					return d.frequency * 8000
-				})
-				.style('fill', filterColor)
-				.style('fill-opacity', "1")
-				.attr('width', function (d) {
-					return xScale(d.frequency) / 2;
-				});
 
-			bars.selectAll('.bar')
-				.filter(function (d) {
-					return d.frequency < filterCutoff;
-				})
-				.transition()
-				.duration(function (d) {
-					return Math.random() * 2000;
-				})
-				.delay(function (d) {
-					return d.frequency * 8000
-				})
-				.style('fill', "steelblue")
-				.style('fill-opacity', "0")
-				.attr('width', function (d) {
-					return xScale(d.frequency) / 2;
-				});
-
-		})
-
-	d3.select(graph)
-		.append("div")
-		.append('button')
-		.style("border", "1px solid black")
-		.text('Reset Filter')
-		.on('click', function () {
-			bars.selectAll('.bar')
-				.transition()
-				.duration(function (d) {
-					return Math.random() * 1000;
-				})
-				.delay(function (d) {
-					return d.frequency * 8000
-				})
-				.style('fill', "steelblue")
-				.style('fill-opacity', "1")
-				.attr('width', function (d) {
-					return xScale(d.frequency) / 2;
-				});
-
-		});
-
-
-	// D3 will grab all the data from "data.csv" and make it available
+	// D3 will grab all the data from "aircraft_incidents.csv" and make it available
 	// to us in a callback function. It follows the form:
-	// 
-	// d3.csv('file_name.csv', accumulator, callback)
-	// 
-	// Where 'file_name.csv' - the name of the file to read
-	// accumulator - a method with parameter d that lets you pre-process
-	//               each row in the CSV. This affects the array of
-	//               rows in the function named 'callback'
-	//
-	// callback - a method with parameters error, data. Error contains
-	//            an error message if the data could not be found, or
-	//            was malformed. The 'data' parameter is an array of
-	//            rows returned after being processed by the accumulator.
-	d3.csv('data.csv', function (d) {
-		d.frequency = +d.frequency;
+	d3.csv('aircraft_incidents.csv', function (d) {
 		return d;
 	}, function (error, data) {
 		// We now have the "massaged" CSV data in the 'data' variable.
 
 		// We set the domain of the xScale. The domain includes 0 up to
-		// the maximum frequency in the dataset. This is because 
-		xScale.domain([0, d3.max(data, function (d) {
-			return d.frequency;
-		})]);
+		// // the maximum frequency in the dataset. This is because
+		// xScale.domain([0, d3.max(data, function (d) {
+		// 	return d.frequency;
+		// })]);
 
 		// We set the domain of the yScale. The scale is ordinal, and
 		// contains every letter in the alphabet (the letter attribute
 		// in our data array). We can use the map function to iterate
 		// through each value in our data array, and make a new array
 		// that contains just letters.
-		yScale.domain(data.map(function (d) {
-			return d.letter;
-		}));
+		// yScale.domain(data.map(function (d) {
+		// 	return d.letter;
+		// }));
 
 		// Append the y-axis to the graph. the translate(20, 0) stuff
 		// shifts the axis 20 pixels from the left. This just helps us
