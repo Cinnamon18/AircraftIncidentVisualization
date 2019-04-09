@@ -17,6 +17,18 @@
   display: none;
 }
 
+.bigHeading {
+	font-size: 30px;
+}
+
+.smallHeading {
+	font-size: 18px;
+}
+
+.textBody {
+	font-size: 14px;
+}
+
 #overview {
   float:left;
   margin: 5px;
