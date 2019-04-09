@@ -78,11 +78,12 @@ function start() {
 
 
 		console.log(allIncidents);
+		let planeSpace = detail.append("g").attr("transform", "translate(20, " + (20) + ")").attr("id", "planeSpace");
 		let column1 = detail.append("g").attr("transform", "translate(20, 300)");
 		let column2 = detail.append("g").attr("transform", "translate(" + (20 + dWidth / 2) + ", 300)");
 		fields.forEach((key, idx) => {
 			let fieldsInCol1 = 10;
-			if(idx < fieldsInCol1) {
+			if (idx < fieldsInCol1) {
 				column1
 					.append("text")
 					.attr("id", key)
@@ -98,8 +99,7 @@ function start() {
 					.text("");
 			}
 		});
-		visualizeDataCase(allIncidents[0]);
-
+		visualizeDataCase(allIncidents[1]);
 	});
 }
 
@@ -108,9 +108,75 @@ function start() {
 function visualizeDataCase(dataCase) {
 	fields.forEach((field) => {
 		let fieldValue = dataCase[field];
-		if(fieldValue == null) {
+		if (fieldValue == null) {
 			fieldValue = "Unknown"
 		}
 		document.getElementById(field).innerHTML = field.replace(new RegExp("_", 'g'), " ") + ": " + fieldValue;
 	});
+
+	let mapScheduleSticker = { "SCHD": "comercial", "NSCH": "private", "": "unknown" };
+	let mapShouldShowClouds = { "VMC": false, "UNK": false, "IMC": true };
+	let mapAccidentPoint = { "APPROACH": 15, "DESCENT": 10, "LANDING": 20, "CRUISE": 0, "TAKEOFF": -20, "CLIMB": -10, "STANDING": 0, "": 0 };
+
+
+	//clear out old plane
+	let planeSpace = d3.select("#temporaryPlaneHolder");
+	if (planeSpace) {
+		planeSpace.remove();
+	}
+
+
+	d3.select('#planeSpace')
+		.append("g")
+		.attr("id", "temporaryPlaneHolder")
+
+	d3.select('#temporaryPlaneHolder')
+		.append("g")
+		.attr("transform", "rotate(" + (27 + mapAccidentPoint[dataCase.Broad_Phase_of_Flight]) + ", 250, 140)")
+		.append("image")
+		.attr("x", "130")
+		.attr("y", "20")
+		.attr("width", "240")
+		.attr("height", "240")
+		.attr("xlink:href", "plane.svg")
+	d3.select('#temporaryPlaneHolder')
+		.append("g")
+		.attr("transform", "rotate(" + (mapAccidentPoint[dataCase.Broad_Phase_of_Flight]) + ", 250, 140)")
+		.append("text")
+		.attr("x", 230)
+		.attr("y", 152)
+		.attr("fill", "white")
+		.attr("font-size", 19)
+		.text(mapScheduleSticker[dataCase.Schedule]);
+
+	if (mapShouldShowClouds[dataCase.Weather_Condition]) {
+		d3.selectAll('#temporaryPlaneHolder')
+			.append("image")
+			.attr("x", "20")
+			.attr("y", "20")
+			.attr("width", "90")
+			.attr("height", "90")
+			.attr("xlink:href", "cloud.svg");
+		d3.selectAll('#temporaryPlaneHolder')
+			.append("image")
+			.attr("x", "100")
+			.attr("y", "180")
+			.attr("width", "90")
+			.attr("height", "90")
+			.attr("xlink:href", "cloud.svg");
+		d3.selectAll('#temporaryPlaneHolder')
+			.append("image")
+			.attr("x", "370")
+			.attr("y", "50")
+			.attr("width", "90")
+			.attr("height", "90")
+			.attr("xlink:href", "cloud.svg");
+		d3.selectAll('#temporaryPlaneHolder')
+			.append("image")
+			.attr("x", "450")
+			.attr("y", "120")
+			.attr("width", "90")
+			.attr("height", "90")
+			.attr("xlink:href", "cloud.svg");
+	}
 }
