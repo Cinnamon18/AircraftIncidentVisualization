@@ -13,7 +13,7 @@ let oWidth, oHeight, dWidth, dHeight;
 let overview;
 
 function start() {
-	// Specify the width and height of the overview
+	// Specify the width and height of the different graph elements
 	oWidth = 800;
 	oHeight = 500;
 	dWidth = 600;
@@ -26,11 +26,6 @@ function start() {
         .attr("height",oHeight)
         .attr('style', "border: 1px solid #777;");
 
-    overview.append('text')
-            .attr('x', oWidth / 2 - 50)
-            .attr('y', 20)
-            .text('Overview Section');
-
 
     let detail = d3.select("#detail")
         .append("svg:svg")
@@ -38,10 +33,6 @@ function start() {
         .attr("height",dHeight)
         .attr('style', "border: 1px solid #777;");
 
-    detail.append('text')
-        .attr('x', dWidth / 2 - 40)
-        .attr('y', 20)
-        .text('Detail Section');
 
     let filter = d3.select("#filter");
 
@@ -71,8 +62,6 @@ function start() {
         deathExtent = d3.extent(allIncidents, function(row) { return row.Total_Fatal_Injuries; });
         uninjuredExtent = d3.extent(allIncidents, function(row) { return row.Total_Uninjured; });
         dateExtent = d3.extent(allIncidents, function(row) { return row.Event_Date; });
-        latExtent = d3.extent(allIncidents, function(row) { return row.Latitude; });
-        longExtent = d3.extent(allIncidents, function(row) { return row.Longitude; });
 
 		console.log(allIncidents);
 		let planeSpace = detail.append("g").attr("transform", "translate(20, " + (20) + ")").attr("id", "planeSpace");
@@ -129,6 +118,12 @@ function visualizeDataCase(dataCase) {
 		.append("g")
 		.attr("id", "temporaryPlaneHolder");
 
+    d3.select('#temporaryPlaneHolder')
+        .append('text')
+        .attr('x', dWidth / 2 - 100)
+        .attr('y', 0)
+        .text("Flight Accident: " + dataCase.Accident_Number);
+
 	d3.select('#temporaryPlaneHolder')
 		.append("g")
 		.attr("transform", "rotate(" + (27 + mapAccidentPoint[dataCase.Broad_Phase_of_Flight]) + ", 250, 140)")
@@ -181,9 +176,8 @@ function visualizeDataCase(dataCase) {
 }
 
 function createFilters(filter) {
-	let xOptions = ["injuries", "deaths", "uninjured"];
-	let yOptions = ["deaths",  "injuries", "uninjured"];
-	let zOptions = ["make", "airline", "phaseOfFlight", "injurySeverity", "aircraftDamage"];
+	let axisOptions = ["Number of Injuries", "Number of Deaths", "Number of Uninjured"];
+	let zOptions = ["Airplane Make", "Phase of Flight", "Aircraft Damage"];
 
     filter.append('text')
         .attr('x', 20)
@@ -194,7 +188,7 @@ function createFilters(filter) {
         .attr('class','select')
 		.attr('id', '#xAxisSelector');
 	xAxisSelector.selectAll('option')
-		.data(xOptions)
+		.data(axisOptions)
 		.enter()
 		.append('option')
 		.text(function (d) { return d; });
@@ -206,7 +200,7 @@ function createFilters(filter) {
         .attr('class','select')
         .attr('id', '#yAxisSelector');
     yAxisSelector.selectAll('option')
-        .data(yOptions)
+        .data(axisOptions)
         .enter()
         .append('option')
         .text(function (d) { return d; });
@@ -250,8 +244,7 @@ function createOverview(overview, data) {
         over.remove();
     }
 
-    let extents = {injuries: injuryExtent, deaths: deathExtent, uninjured: uninjuredExtent};
-    let possibleAxis = { injuries: "Number of Injuries", deaths: "Number of Deaths", uninjured: "Number of Uninjured"};
+    let extents = {"Number of Injuries": injuryExtent, "Number of Deaths": deathExtent, "Number of Uninjured": uninjuredExtent};
 
     let xScale = d3.scaleLinear().domain(extents[xAxisLabel]).range([50, oWidth - 50]);
     let yScale = d3.scaleLinear().domain(extents[yAxisLabel]).range([oHeight - 50, 50]);
@@ -260,6 +253,11 @@ function createOverview(overview, data) {
     let yAxis = d3.axisLeft().scale(yScale);
 
 	let graph = overview.append('g');
+
+    graph.append('text')
+        .attr('x', oWidth / 2 - 100)
+        .attr('y', 20)
+        .text(yAxisLabel + " vs. "+ xAxisLabel);
 
     // add x axis
     graph.append("g")
@@ -270,7 +268,7 @@ function createOverview(overview, data) {
         .attr("x", oWidth / 2.0 + 15)
         .attr("y", 30)
         .style("text-anchor", "end")
-        .text(possibleAxis[xAxisLabel])
+        .text(xAxisLabel)
         .style("fill", "black");
 
     // add y axis
@@ -283,7 +281,7 @@ function createOverview(overview, data) {
         .attr('x', 0 - oHeight / 2 + 20)
         .attr('y', -32)
         .style("text-anchor", "end")
-        .text(possibleAxis[yAxisLabel])
+        .text(yAxisLabel)
         .style("fill", "black");
 
     // add points to graph
@@ -293,7 +291,7 @@ function createOverview(overview, data) {
         .append("circle")
         .classed("circle", true)
         .attr("id",function(d,i) {return "c1" + i;} )
-        .attr("stroke", "black")
+        .style("fill", function(d){ return calculatePointColor(d);})
         .attr("cx", function(d) { return getAxisValue(xScale, d, xAxisLabel);})
         .attr("cy", function(d) { return getAxisValue(yScale, d, yAxisLabel); })
         .attr("r", 5)
@@ -303,8 +301,27 @@ function createOverview(overview, data) {
         });
 }
 
+function calculatePointColor(d) {
+    let colors = ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"];
+    let craftDamageOptions = {"Destroyed" : colors[0], "Minor": colors[1], "Substantial": colors[2], "": colors[3]};
+    let makeOptions = {"Airbus" : colors[0], "Boeing": colors[1], "Bombardier": colors[2], "Embraer": colors[3], "McDonnell Douglas": colors[4]};
+    let phaseOptions = {"APPROACH" : colors[0], "CLIMB": colors[1], "CRUISE": colors[2], "DESCENT": colors[3],
+                        "GO-AROUND": colors[4], "LANDING": colors[5], "MANEUVERING": colors[6], "STANDING": colors[7],
+                        "TAKEOFF": colors[8], "TAXI": colors[9], "OTHER": colors[10], "UNKNOWN": colors[10], "": colors[10]};
+
+
+    if (zAxisLabel === "Airplane Make") {
+        return makeOptions[d.Make];
+    } else if (zAxisLabel === "Aircraft Damage") {
+        return craftDamageOptions[d.Aircraft_Damage];
+    } else if (zAxisLabel === "Phase of Flight"){
+        return phaseOptions[d.Broad_Phase_of_Flight];;
+    }
+
+}
+
 function getAxisValue(scale, d, label) {
-    let values = {injuries: d.Total_Serious_Injuries, deaths: d.Total_Fatal_Injuries, uninjured: d.Total_Uninjured};
+    let values = {"Number of Injuries": d.Total_Serious_Injuries, "Number of Deaths": d.Total_Fatal_Injuries, "Number of Uninjured": d.Total_Uninjured};
     return scale(values[label]);
 }
 
