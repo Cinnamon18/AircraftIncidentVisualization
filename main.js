@@ -8,10 +8,10 @@ window.onload = start;
 let allIncidents = null;
 let fields = null;
 let xAxisLabel, yAxisLabel, zAxisLabel;
-let injuryExtent, deathExtent, uninjuredExtent, dateExtent, latExtent, longExtent;
+let injuryExtent, deathExtent, uninjuredExtent;
 let oWidth, oHeight, dWidth, dHeight;
 let overview;
-let make, phase, damage;
+let make, damage;
 let x, y;
 
 function start() {
