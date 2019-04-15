@@ -1,43 +1,78 @@
 .bar {
-  fill: steelblue;
+    fill: steelblue;
 }
+
 .bar:hover {
-  fill: brown;
+    fill: brown;
 }
+
 .axis {
-  font: 10px sans-serif;
+    font: 10px sans-serif;
 }
+
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
+
 .x.axis path {
-  display: none;
+    display: none;
 }
 
 .bigHeading {
-	font-size: 30px;
+    font-size: 30px;
 }
 
 .smallHeading {
-	font-size: 18px;
+    font-size: 18px;
 }
 
 .textBody {
-	font-size: 14px;
+    font-size: 14px;
 }
 
 #overview {
-  float:left;
-  margin: 5px;
+    float: left;
+    margin: 5px;
 }
-#detail{
-  float:left;
-  margin: 5px;
+
+#detail {
+    float: left;
+    margin: 5px;
 }
+
 #filter {
-  float:left;
-  margin: 5px;
+    float: left;
+    margin: 5px;
+}
+
+.select {
+    margin-right: 10px;
+}
+
+.subChart {
+    border: 1px solid #777;
+    border-radius: 10px;
+}
+
+.axisLabel {
+    font-size: 12px;
+    fill: black;
+}
+
+.highlightedDataCase {
+    stroke: black;
+    stroke-width: 3px;
+}
+
+/* just for compatability or i'd use webkit */
+.legend {
+	font-family: Verdana;
+	font-weight: bold;
+    font-size: 23px;
+    margin-left: 10px;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	/* -webkit-text-stroke: 1px black; */
 }
